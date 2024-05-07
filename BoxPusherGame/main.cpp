@@ -9,6 +9,9 @@
 #include<conio.h>//キー入力用
 #include<Windows.h>//sleep()を使うため
 
+//色の定義
+enum { BLACK, RED, GREEN, YELLOW, MAGENTA, CYAN, WHITE };
+
 //マップデータの定義
 //#:壁、P:プレイヤー、B:箱、G:ゴール
 #define MAP_W 22
@@ -45,13 +48,54 @@ bool is_game_clear(void);
 void move(int x, int y, int move_x, int move_y);
 void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]);
 
+//main関数
+int main(void) {
+	//初期マップをコピーして退避しておく
+	copyMap(map, tmp_map);
+
+	//ゲームループ
+	while (1) {
+		//プレイヤーの現在地を求める
+		search_player_position();
+		//キー入力、プレイヤーの移動
+		int key = 0;
+		if (kbhit())key = getch();
+		//移動上
+		if (key == KEY_UP) move(player_x, player_y, 0, -1);
+		//移動下
+		if (key == KEY_DOWN) move(player_x, player_y, 0, 1);
+		//移動左
+		if (key == KEY_LEFT) move(player_x, player_y, -1, 0);
+		//移動右
+		if (key == KEY_RIGHT) move(player_x, player_y, 1, 0);
+		//スペースキーでマップをリセット
+		if (key == KEY_SPACE) copyMap(tmp_map, map);	//退避しておいたマップをコピーする
+
+		//マップの更新
+		draw_map();
+		//リセット機能の説明
+		cursor(1, MAP_H + 1);
+		printf("Press space to reset the map.");
+		//待機する
+		Sleep(50);
+		//ゲームクリア処理
+		if (is_game_clear()) {
+			color(RED);
+			cursor(MAP_W / 2 - 5, MAP_H / 2);
+			printf("GAME CLEAR");
+			cursor(0, MAP_H + 1);
+			Sleep(1000);
+			return 0;
+		}
+	}
+}
+
 //カーソル位置を指定する関数
 void cursor(int x, int y) {
 	printf("\x1b[%d;%dH", y + 1, x + 1);
 }
 
 //文字や文字列の色を指定する関数
-enum { BLACK, RED, GREEN, YELLOW, MAGENTA, CYAN, WHITE };
 void color(int col) {
 	printf("\x1b[3%dm", col);
 }
@@ -129,48 +173,6 @@ void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]) {
 	for (int y = 0; y < MAP_H; y++) {
 		for (int x = 0; x < MAP_W; x++) {
 			copyTo[y][x] = source[y][x];
-		}
-	}
-}
-
-//main関数
-int main(void) {
-	//初期マップをコピーして退避しておく
-	copyMap(map, tmp_map);
-
-	//ゲームループ
-	while (1) {
-		//プレイヤーの現在地を求める
-		search_player_position();
-		//キー入力、プレイヤーの移動
-		int key = 0;
-		if (kbhit())key = getch();
-		//移動上
-		if (key == KEY_UP) move(player_x, player_y, 0, -1);
-		//移動下
-		if (key == KEY_DOWN) move(player_x, player_y, 0, 1);
-		//移動左
-		if (key == KEY_LEFT) move(player_x, player_y, -1, 0);
-		//移動右
-		if (key == KEY_RIGHT) move(player_x, player_y, 1, 0);
-		//スペースキーでマップをリセット
-		if (key == KEY_SPACE) copyMap(tmp_map, map);	//退避しておいたマップをコピーする
-
-		//マップの更新
-		draw_map();
-		//リセット機能の説明
-		cursor(1, MAP_H + 1);
-		printf("Press space to reset the map.");
-		//待機する
-		Sleep(50);
-		//ゲームクリア処理
-		if (is_game_clear()) {
-			color(RED);
-			cursor(MAP_W / 2 - 5, MAP_H / 2);
-			printf("GAME CLEAR");
-			cursor(0, MAP_H + 1);
-			Sleep(1000);
-			return 0;
 		}
 	}
 }
