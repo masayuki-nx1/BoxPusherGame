@@ -3,6 +3,7 @@
 #define KEY_DOWN 80
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
+#define KEY_SPACE 32
 
 #include<stdio.h>
 #include<conio.h>//キー入力用
@@ -13,17 +14,6 @@
 #define MAP_W 22
 #define MAP_H 11
 char map[MAP_H][MAP_W] = {
-	//"####################",
-	//"#        #     B G #",
-	//"#   ##       ###   #",
-	//"#G  #         #    #",
-	//"#   #    B    # P  #",
-	//"#   #         #    #",
-	//"#   ##        #    #",
-	//"#        #    G B  #",
-	//"#        #  ##     #",
-	//"#        #         #",
-	//"####################",
 	"    #####        ",
 	"    #   #        ",
 	"    #B  #        ",
@@ -44,6 +34,16 @@ char tmp_map[MAP_H][MAP_W];
 //ゲームで扱う変数の定義
 int player_x = 1, player_y = 1;
 
+// 関数のプロトタイプ宣言
+void cursor(int x, int y);
+void color(int col);
+void draw_map(void);
+void search_player_position(void);
+bool is_move_ok(int x, int y);
+void move_block(int x, int y);
+bool is_game_clear(void);
+void move(int x, int y, int move_x, int move_y);
+void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]);
 
 //カーソル位置を指定する関数
 void cursor(int x, int y) {
@@ -64,7 +64,7 @@ void draw_map(void) {
 			if (map[y][x] == '#') color(GREEN);
 			if (map[y][x] == 'B') color(YELLOW);
 			if (map[y][x] == 'G') color(WHITE);
-			//if (map[y][x] == 'P') color(MAGENTA);
+			if (map[y][x] == 'P') color(RED);
 			cursor(x, y);
 			printf("%c", map[y][x]);
 		}
@@ -111,67 +111,56 @@ bool is_game_clear() {
 	return f;
 }
 
+//プレイヤーの移動処理
+void move(int x, int y, int move_x, int move_y) {
+	if (is_move_ok(x + move_x, y + move_y)) {
+		map[y][x] = ' ';
+		map[y + move_y][x + move_x] = 'P';
+	}
+	else if (map[y + move_y][x + move_x] == 'B' && is_move_ok(x + move_x * 2, y + move_y * 2)) {	//2歩先が移動可能か調べる、*2すれば2歩先が調べれれる
+		map[y][x] = ' ';
+		map[y + move_y][x + move_x] = 'P';
+		map[y + move_y * 2][x + move_x * 2] = 'B';
+	}
+}
+
+//マップをコピーする関数
+void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]) {
+	for (int y = 0; y < MAP_H; y++) {
+		for (int x = 0; x < MAP_W; x++) {
+			copyTo[y][x] = source[y][x];
+		}
+	}
+}
+
 //main関数
 int main(void) {
 	//初期マップをコピーして退避しておく
-	for (int y = 0; y < MAP_H; y++) {
-		for (int x = 0; x < MAP_W; x++) {
-			tmp_map[y][x] = map[y][x];
-		}
-	}
-	//プレイヤーの現在地を求める
-	search_player_position();
-	//プレイヤーの初期位置は削除する
-	map[player_y][player_x] = ' ';
+	copyMap(map, tmp_map);
+
 	//ゲームループ
 	while (1) {
+		//プレイヤーの現在地を求める
+		search_player_position();
 		//キー入力、プレイヤーの移動
 		int key = 0;
 		if (kbhit())key = getch();
 		//移動上
-		if (key == KEY_UP && is_move_ok(player_x, player_y - 1)) {
-			player_y--;
-		} else if (key == KEY_UP && map[player_y - 1][player_x] == 'B' && is_move_ok(player_x, player_y - 2)) {
-			//ブロック移動処理
-			map[player_y - 1][player_x] = ' ';
-			map[player_y - 2][player_x] = 'B';
-			player_y--;
-		}
+		if (key == KEY_UP) move(player_x, player_y, 0, -1);
 		//移動下
-		if (key == KEY_DOWN && is_move_ok(player_x, player_y + 1)) {
-			player_y++;
-		} else if (key == KEY_DOWN && map[player_y + 1][player_x] == 'B' && is_move_ok(player_x, player_y + 2)) {
-			//ブロック移動処理
-			map[player_y + 1][player_x] = ' ';
-			map[player_y + 2][player_x] = 'B';
-			player_y++;
-		}
+		if (key == KEY_DOWN) move(player_x, player_y, 0, 1);
 		//移動左
-		if (key == KEY_LEFT && is_move_ok(player_x - 1, player_y)) {
-			player_x--;
-		} else if (key == KEY_LEFT && map[player_y][player_x - 1] == 'B' && is_move_ok(player_x - 2, player_y)) {
-			//ブロック移動処理
-			map[player_y][player_x - 1] = ' ';
-			map[player_y][player_x - 2] = 'B';
-			player_x--;
-		}
+		if (key == KEY_LEFT) move(player_x, player_y, -1, 0);
 		//移動右
-		if (key == KEY_RIGHT && is_move_ok(player_x + 1, player_y)) {
-			player_x++;
-		} else if (key == KEY_RIGHT && map[player_y][player_x + 1] == 'B' && is_move_ok(player_x + 2, player_y)) {
-			//ブロック移動処理
-			map[player_y][player_x + 1] = ' ';
-				map[player_y][player_x + 2] = 'B';
-				player_x++;
-		}
+		if (key == KEY_RIGHT) move(player_x, player_y, 1, 0);
+		//スペースキーでマップをリセット
+		if (key == KEY_SPACE) copyMap(tmp_map, map);	//退避しておいたマップをコピーする
 
 		//マップの更新
 		draw_map();
-		//プレイヤーの位置の更新
-		cursor(player_x, player_y);
-		color(RED);
-		printf("P");
-		cursor(MAP_W, MAP_H);
+		//リセット機能の説明
+		cursor(1, MAP_H + 1);
+		printf("Press space to reset the map.");
 		//待機する
 		Sleep(50);
 		//ゲームクリア処理
