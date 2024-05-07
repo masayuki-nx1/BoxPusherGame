@@ -3,6 +3,7 @@
 #define KEY_DOWN 80
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
+#define KEY_SPACE 32
 
 #include<stdio.h>
 #include<conio.h>//キー入力用
@@ -42,6 +43,7 @@ bool is_move_ok(int x, int y);
 void move_block(int x, int y);
 bool is_game_clear(void);
 void move(int x, int y, int move_x, int move_y);
+void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]);
 
 //カーソル位置を指定する関数
 void cursor(int x, int y) {
@@ -109,26 +111,32 @@ bool is_game_clear() {
 	return f;
 }
 
+//プレイヤーの移動処理
 void move(int x, int y, int move_x, int move_y) {
 	if (is_move_ok(x + move_x, y + move_y)) {
 		map[y][x] = ' ';
 		map[y + move_y][x + move_x] = 'P';
 	}
-	else if (map[y + move_y][x + move_x] == 'B' && is_move_ok(x + move_x * 2, y + move_y * 2)) { //2歩先が移動可能か調べる、*2すれば2歩先が調べれれる
+	else if (map[y + move_y][x + move_x] == 'B' && is_move_ok(x + move_x * 2, y + move_y * 2)) {	//2歩先が移動可能か調べる、*2すれば2歩先が調べれれる
 		map[y][x] = ' ';
 		map[y + move_y][x + move_x] = 'P';
 		map[y + move_y * 2][x + move_x * 2] = 'B';
 	}
 }
 
+//マップをコピーする関数
+void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]) {
+	for (int y = 0; y < MAP_H; y++) {
+		for (int x = 0; x < MAP_W; x++) {
+			copyTo[y][x] = source[y][x];
+		}
+	}
+}
+
 //main関数
 int main(void) {
 	//初期マップをコピーして退避しておく
-	for (int y = 0; y < MAP_H; y++) {
-		for (int x = 0; x < MAP_W; x++) {
-			tmp_map[y][x] = map[y][x];
-		}
-	}
+	copyMap(map, tmp_map);
 
 	//ゲームループ
 	while (1) {
@@ -140,16 +148,19 @@ int main(void) {
 		//移動上
 		if (key == KEY_UP) move(player_x, player_y, 0, -1);
 		//移動下
-		if (key == KEY_DOWN)move(player_x, player_y, 0, 1);
+		if (key == KEY_DOWN) move(player_x, player_y, 0, 1);
 		//移動左
-		if (key == KEY_LEFT)move(player_x, player_y, -1, 0);
+		if (key == KEY_LEFT) move(player_x, player_y, -1, 0);
 		//移動右
-		if (key == KEY_RIGHT)move(player_x, player_y, 1, 0);
-
+		if (key == KEY_RIGHT) move(player_x, player_y, 1, 0);
+		//スペースキーでマップをリセット
+		if (key == KEY_SPACE) copyMap(tmp_map, map);	//退避しておいたマップをコピーする
 
 		//マップの更新
 		draw_map();
-
+		//リセット機能の説明
+		cursor(1, MAP_H + 1);
+		printf("Press space to reset the map.");
 		//待機する
 		Sleep(50);
 		//ゲームクリア処理
