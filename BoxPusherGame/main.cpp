@@ -13,8 +13,8 @@
 //色の定義
 enum { BLACK, RED, GREEN, YELLOW, MAGENTA, CYAN, WHITE };
 
-////マップデータの定義
-////#:壁、P:プレイヤー、B:箱、G:ゴール
+//マップデータの定義 mapデータはmaps.cppに記述されている
+//#:壁、P:プレイヤー、B:箱、G:ゴール
 char map[MAP_H][MAP_W];
 
 //マップの初期状態を保管する変数
@@ -38,7 +38,7 @@ void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]);
 int main(void) {
 
 	//mapを指定して読みだす
-	copyMap(maps[1], map);
+	copyMap(maps[1], map);	//mapsの添字を変更すればコースを変更できます。
 	//初期マップをコピーして退避しておく
 	copyMap(map, tmp_map);
 
