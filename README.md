@@ -10,3 +10,24 @@ Windowsで動作します。
 スペースキー(`SPACE`)を押すとマップがリセットされます。
 
 ![Game Image](images/game.png)
+
+## ゲームのセットアップと実行
+このゲームを実際に動かすには以下の手順を行ってください。Windows出ないと動作しないと思います。
+
+### ダウンロード
+1. GitHubからzipでダウンロードするか、クローンする。  
+![Game Image](images/image04.png)
+
+### Visual Studioでのプロジェクトのセットアップ
+1. ダウンロードしたフォルダを解凍するか、またはクローンしたリポジトリのディレクトリに移動します。  
+![Game Image](images/image01.png)
+
+1. Visual Studioを開き、「ファイル」>「開く」>「プロジェクト/ソリューション」を選択します。  
+1. BoxPusherGame.slnファイルを選択してプロジェクトを開きます。  
+![Game Image](images/image02.png)
+
+### ゲームの実行
+1. Visual StudioでBoxPusherGameプロジェクトが開かれた状態で、「デバッグ」メニューから「デバッグ開始」を選択するか、F5キーを押してデバッグを開始します。  
+![Game Image](images/image03.png)
+
+1. コンソールウィンドウが開き、ゲームが起動します。  
