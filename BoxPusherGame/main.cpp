@@ -6,29 +6,16 @@
 #define KEY_SPACE 32
 
 #include<stdio.h>
-#include<conio.h>//キー入力用
-#include<Windows.h>//sleep()を使うため
+#include<conio.h>		//キー入力用
+#include<Windows.h>		//sleep()を使うため
+#include "maps.h"		//マップデータを格納しているソースファイル
 
 //色の定義
 enum { BLACK, RED, GREEN, YELLOW, MAGENTA, CYAN, WHITE };
 
-//マップデータの定義
+//マップデータの定義 mapデータはmaps.cppに記述されている
 //#:壁、P:プレイヤー、B:箱、G:ゴール
-#define MAP_W 22
-#define MAP_H 11
-char map[MAP_H][MAP_W] = {
-	"    #####        ",
-	"    #   #        ",
-	"    #B  #        ",
-	"  ###  B###      ",
-	"  #  B  B #      ",
-	"### # ### #######",
-	"#   # ### ##  GG#",
-	"# B  B      P GG#",
-	"##### #### #  GG#",
-	"    #      ######",
-	"    ########     ",
-};
+char map[MAP_H][MAP_W];
 
 //マップの初期状態を保管する変数
 char tmp_map[MAP_H][MAP_W];
@@ -49,6 +36,9 @@ void copyMap(char source[MAP_H][MAP_W], char copyTo[MAP_H][MAP_W]);
 
 //main関数
 int main(void) {
+
+	//mapを指定して読みだす
+	copyMap(maps[1], map);	//mapsの添字を変更すればコースを変更できます。
 	//初期マップをコピーして退避しておく
 	copyMap(map, tmp_map);
 
